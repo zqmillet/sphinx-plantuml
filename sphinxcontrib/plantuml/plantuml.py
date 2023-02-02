@@ -21,6 +21,7 @@ class PlantUMLDirective(Figure, SphinxDirective):
     an environment for figure
     """
     required_arguments = 0
+    optional_arguments = 1
 
     option_spec = {
         **Figure.option_spec,
@@ -28,18 +29,28 @@ class PlantUMLDirective(Figure, SphinxDirective):
         'format': parse_figure_format,
     }
 
+    def get_uml(self):
+        if not self.arguments:
+            return '\n'.join(self.content)
+
+        file_path, *_ = self.arguments  # type: ignore
+        _, file_path = self.env.relfn2path(file_path)
+
+        with open(file_path, 'r', encoding='utf8') as file:
+            return file.read()
+
     def run(self) -> List:
         """
         render this environment
         """
-        uml = '\n'.join(self.content)
         image_type = self.options.get('format', 'svg')
 
-        url = f'https://www.plantuml.com/plantuml/{image_type}/{encode(uml)}'
+        url = f'https://www.plantuml.com/plantuml/{image_type}/{encode(self.get_uml())}'
         self.arguments = [url]
 
         if 'caption' in self.options:
             self.content = StringList([self.options['caption']])
         else:
             self.content = StringList()
+
         return super().run()

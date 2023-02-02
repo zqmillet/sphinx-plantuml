@@ -1,12 +1,16 @@
 sphinx-plantuml 简介
 ====================
 
-PlantUML 是可以用纯文本语言绘制图表的开源软件. PlantUML 支持许多统一建模语言的图, 也支持其他软件开发相关的格式/C4 模型/电脑网络图/ER 模型/甘特图/心智图和工作分解结构, 也可以用在 JSON 及 YAML 文档的可视化.
+PlantUML 是可以用纯文本语言绘制图表的开源软件. PlantUML 支持许多统一建模语言, 也支持其他软件开发相关的格式, 比如 C4 模型/电脑网络图/ER 模型/甘特图/心智图和工作分解结构图等, 也可以用在 JSON 及 YAML 文档的可视化.
 
-可以使用 `sphinx-contrib/plantuml <https://github.com/sphinx-contrib/plantuml/>`_ 在 Sphinx 文档中插入 PlantUML 图片. 但是构建环境需要配置 Java 以及 PlantUML 相关 jar 包. sphinx-plantuml 库是一个纯 Python 库, 不依赖其他组件, 对开发环境更友好.
+在 Sphinx 中, 你可以使用 `sphinx-contrib/plantuml <https://github.com/sphinx-contrib/plantuml/>`_ 在文档中插入 PlantUML 图片. 但是构建环境需要配置 Java 以及 PlantUML 相关 jar 包, 配置起来比较麻烦. 此外, 本地编译也比较慢, 拖慢整个构建过程.
 
-sphinx-plantuml 安装
-====================
+因此我开发了 sphinx-plantuml 库, sphinx-plantuml 的优点有:
+
+- 纯 Python 库, 无需配置任何环境或者依赖, 开箱即用.
+- 快速的构建速度, 因为构建过程无需编译 PlantUML.
+- 兼容内置 ``figure`` 命令大部分参数, 容易上手.
+- 支持 ``.uml`` 文件的引用, 便于项目管理.
 
 sphinx-plantuml 原理
 ====================
@@ -31,121 +35,171 @@ sphinx-plantuml 工作原理如 :numref:`working_principle_figure` 所示.
 
 sphinx-plantuml 利用 https://plantuml.com 网站对 PlantUML 代码进行渲染. 构建的时候不需要渲染, 也不需要联网. 只有在文档被浏览时才会渲染, 因此浏览的时候需要联网. 由于是利用官方网站进行渲染, 因此构建环境无需配置 PlantUML 相关依赖.
 
+sphinx-plantuml 安装
+====================
+
+使用 ``python3 -m pip install sphinx-plantuml`` 安装 sphinx-plantuml.
+
+然后在你的 ``conf.py`` 文件中添加插件的引用, 如下代码所示.
+
+.. code-block:: python
+
+    extensions = [
+        ...
+        'sphinxcontrib.plantuml',
+        ...
+    ]
+
 sphinx-plantuml 使用
 ====================
 
+sphinx-plantuml 提供了 ``plantuml`` 命令. 你可以直接在 ``plantuml`` 中写 UML 语言, 比如 :numref:`plantuml_demo_1` 所示的 reST 代码.
+
+.. _plantuml_demo_1:
+.. code-block:: rest
+    :caption: 可以直接 ``plantuml`` 环境中写 UML 代码
+
+    .. plantuml::
+        :align: center
+
+        @startuml
+        Alice -> Bob: test
+        @enduml
+
+其渲染结果如下图所示.
+
 .. plantuml::
     :align: center
-    :caption: 内嵌 HTML
+    :caption: :numref:`plantuml_demo_1` 渲染效果
 
     @startuml
-    skinparam backgroundColor transparent
-    :* You can change <color:red>text color</color>
-    * You can change <back:cadetblue>background color</back>
-    * You can change <size:18>size</size>
-    * You use <u>legacy</u> <b>HTML <i>tag</i></b>
-    * You use <u:red>color</u> <s:green>in HTML</s> <w:#0000FF>tag</w>
-    ----
-    * image x0.5 : <img:http://plantuml.com/logo3.png{scale=0.5}>
-    ----
-    * image x1.5 : <img:http://plantuml.com/logo3.png{scale=1.5}>
-    ;
+    Alice -> Bob: test
     @enduml
+
+sphinx-plantuml 默认将图片渲染成 ``.svg``, 如果你想渲染成 ``.png``, 可以使用 ``:format:`` 参数指定渲染格式, 比如 :numref:`plantuml_demo_2` 所示的 reST 代码.
+
+.. _plantuml_demo_2:
+.. code-block:: rest
+    :caption: 指定图片渲染格式
+
+    .. plantuml::
+        :align: center
+        :format: png
+
+        @startuml
+        Alice -> Bob: test
+        @enduml
+
+其渲染结果如下图所示.
 
 .. plantuml::
     :align: center
+    :format: png
+    :caption: png 渲染效果
+
+    @startuml
+    Alice -> Bob: test
+    @enduml
+
+如果你想给图片添加标题, 可以使用 ``:caption:`` 参数指定标题, 如 :numref:`plantuml_demo_3` 所示的 reST 代码.
+
+.. _plantuml_demo_3:
+.. code-block:: rest
+    :caption: 指定图片标题
+
+    .. plantuml::
+        :align: center
+        :format: png
+        :caption: 苟利国家生死以, 岂因祸福避趋之
+
+        @startuml
+        Alice -> Bob: test
+        @enduml
+
+其渲染结果如下图所示.
+
+.. plantuml::
+    :align: center
+    :format: png
+    :caption: 苟利国家生死以, 岂因祸福避趋之
+
+    @startuml
+    Alice -> Bob: test
+    @enduml
+
+Sphinx 内置的 ``figure`` 命令的大部分参数 ``plantuml`` 都支持, 比如你可以使用 ``:width:`` 参数来设置图片的大小, 如 :numref:`plantuml_demo_4` 所示.
+
+.. _plantuml_demo_4:
+.. code-block:: rest
+    :caption: 指定图片宽度
+
+    .. plantuml::
+        :align: center
+        :format: png
+        :width: 50%
+
+        @startuml
+        Alice -> Bob: test
+        @enduml
+
+其渲染结果如下图所示.
+
+.. plantuml::
+    :align: center
+    :format: png
+    :width: 50%
+    :caption: 50% 宽度的图片
+
+    @startuml
+    Alice -> Bob: test
+    @enduml
+
+.. note::
+
+    不是所有的 ``figure`` 的参数都支持, 因为无法提前获取图片的尺寸, ``:scale:`` 参数就无法支持.
+
+如果你的 PlantUML 代码是在另一个文件中, 可以采用如 :numref:`reference_code_file` 所示代码实现.
+
+.. _reference_code_file:
+.. code-block:: rest
+    :caption: 引用 PlantUML 代码文件
+
+    .. plantuml:: /umls/insert_html.uml
+        :align: center
+        :width: 50%
+        :caption: 内嵌 HTML 示例
+
+    .. plantuml:: /umls/aws_demo.uml
+        :align: center
+        :width: 50%
+        :caption: AWS 示例
+
+    .. plantuml:: /umls/c4_demo.uml
+        :caption: C4 模型示例
+        :format: svg
+        :width: 50%
+        :align: center
+
+:numref:`reference_code_file` 中的代码的渲染效果如下所示.
+
+.. plantuml:: /umls/insert_html.uml
+    :align: center
+    :width: 50%
+    :caption: 内嵌 HTML 示例
+
+.. plantuml:: /umls/aws_demo.uml
+    :align: center
+    :width: 50%
     :caption: AWS 示例
 
-    @startuml
-    skinparam backgroundColor transparent
-
-
-    !includeurl <aws/common.puml>
-    !includeurl <aws/ApplicationServices/AmazonAPIGateway/AmazonAPIGateway.puml>
-    !includeurl <aws/Compute/AWSLambda/AWSLambda.puml>
-    !includeurl <aws/Compute/AWSLambda/LambdaFunction/LambdaFunction.puml>
-    !includeurl <aws/Database/AmazonDynamoDB/AmazonDynamoDB.puml>
-    !includeurl <aws/Database/AmazonDynamoDB/table/table.puml>
-    !includeurl <aws/General/AWScloud/AWScloud.puml>
-    !includeurl <aws/General/client/client.puml>
-    !includeurl <aws/General/user/user.puml>
-    !includeurl <aws/SDKs/JavaScript/JavaScript.puml>
-    !includeurl <aws/Storage/AmazonS3/AmazonS3.puml>
-    !includeurl <aws/Storage/AmazonS3/bucket/bucket.puml>
-
-    skinparam componentArrowColor Black
-    skinparam componentBackgroundColor White
-    skinparam nodeBackgroundColor White
-    skinparam agentBackgroundColor White
-    skinparam artifactBackgroundColor White
-
-
-    USER(user)
-    CLIENT(browser)
-    JAVASCRIPT(js,SDK)
-
-    AWSCLOUD(aws) {
-
-        AMAZONS3(s3) {
-            BUCKET(site,www.insecurity.co)
-            BUCKET(logs,logs.insecurity.co)
-        }
-
-        AMAZONAPIGATEWAY(api)
-
-        AWSLAMBDA(lambda) {
-            LAMBDAFUNCTION(addComments,addComments)
-        }
-
-        AMAZONDYNAMODB(dynamo) {
-            TABLE(comments,Comments)
-        }
-    }
-
-    user - browser
-
-    browser -d-> site :**1a**) get\nstatic\ncontent
-    site ~> logs :1a
-    site .u.> browser :**1b**
-    browser - js
-    js -r-> comments :**2a**) get\ncomments
-    comments ..> js :**2b**
-
-    js -r-> api :**3**) add\ncomment
-
-    api -d-> addComments :**4**
-
-    addComments -> comments :**5**
-
-    comments ..> js :**6**) new\ncomments
-    @enduml
-
-.. plantuml::
+.. plantuml:: /umls/c4_demo.uml
     :caption: C4 模型示例
     :format: svg
+    :width: 50%
     :align: center
 
-    @startuml
-    !include <c4/C4_Context.puml>
-    skinparam backgroundColor transparent
+其中三个 ``.uml`` 文件的下载链接如下:
 
-    'ref http://plantuml.com/stdlib
-    !include <office/Users/user.puml>
-    !include <office/Users/mobile_user.puml>
-
-    'LAYOUT_WITH_LEGEND
-
-    title System Context diagram for Internet Banking System
-
-    Person(customer  , Customer , "<$user> <$mobile_user>\n A customer of the bank, with personal bank accounts" )
-
-    System(banking_system, "Internet Banking System", "Allows customers to view information about their bank accounts, and make payments.")
-
-    System_Ext(mail_system, "E-mail system", "The internal Microsoft Exchange e-mail system.")
-    System_Ext(mainframe, "Mainframe Banking System", "Stores all of the core banking information about customers, accounts, transactions, etc.")
-
-    Rel(customer, banking_system, "Uses")
-    Rel_Back(customer, mail_system, "Sends e-mails to")
-    Rel_Neighbor(banking_system, mail_system, "Sends e-mails", "SMTP")
-    Rel(banking_system, mainframe, "Uses")
-    @enduml
+- :download:`insert_html.uml </umls/insert_html.uml>`;
+- :download:`aws_demo.uml </umls/aws_demo.uml>`;
+- :download:`c4_demo.uml </umls/c4_demo.uml>`.
