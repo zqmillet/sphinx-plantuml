@@ -6,11 +6,12 @@ from typing import List
 from docutils.parsers.rst import directives
 from docutils.parsers.rst.directives.images import Figure
 from docutils.statemachine import StringList
+from docutils.nodes import figure
 from sphinx.util.docutils import SphinxDirective
 
 from .encode import encode
 
-def parse_figure_format(argument):
+def parse_figure_format(argument: str) -> str:
     """
     this function is used to parse overflow parameter.
     """
@@ -29,7 +30,7 @@ class PlantUMLDirective(Figure, SphinxDirective):
         'format': parse_figure_format,
     }
 
-    def get_uml(self):
+    def get_uml(self) -> str:
         if not self.arguments:
             return '\n'.join(self.content)
 
@@ -39,7 +40,7 @@ class PlantUMLDirective(Figure, SphinxDirective):
         with open(file_path, 'r', encoding='utf8') as file:
             return file.read()
 
-    def run(self) -> List:
+    def run(self) -> List[figure]:
         """
         render this environment
         """
