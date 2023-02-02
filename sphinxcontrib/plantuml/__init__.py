@@ -1,7 +1,7 @@
 """
 this is the package sphinxcontrib.plantuml.
 """
-__version__ = (1, 0, 1)
+__version__ = (1, 0, 0)
 
 from typing import Dict
 from typing import Any
