@@ -77,3 +77,9 @@ sphinx-plantuml directive supports almost all arguments of sphinx builtin figure
     :caption: this is caption
     :align: center
 ```
+
+## configuration
+
+**plantuml_server**
+
+  URL to the plantuml server. (default: `https://www.plantuml.com/plantuml`)

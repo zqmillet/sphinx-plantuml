@@ -46,7 +46,7 @@ class PlantUMLDirective(Figure, SphinxDirective):
         """
         image_type = self.options.get('format', 'svg')
 
-        url = f'https://www.plantuml.com/plantuml/{image_type}/{encode(self.get_uml())}'
+        url = f'{self.env.config.plantuml_server}/{image_type}/{encode(self.get_uml())}'
         self.arguments = [url]
 
         if 'caption' in self.options:
